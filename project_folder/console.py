@@ -3,6 +3,7 @@ import cmd
 from models.user import User
 from models.place import Place
 from models.city import City
+from models.review import Review
 from models.engine.file_storage import FileStorage
 from models import storage
 
@@ -73,6 +74,30 @@ class HBNBCommand(cmd.Cmd):
                 print("** no instance found **")
         except ValueError:
             print("** class name missing or id missing **")
+            
+    def do_update(self, args):
+        try:
+            args_list = args.split()
+            if len(args_list) < 4:
+                print("** Usage: update <class name> <id> <attribute name> <attribute value> **")
+                return
+            class_name, obj_id, attr_name, attr_value = args_list[0], args_list[1], args_list[2], args_list[3]
+            key = f"{class_name}.{obj_id}"
+            
+            #check if object exist in the storage
+            if key in storage.all():
+                obj = storage.all()[key]
+                #update the attribute
+                setattr(obj, attr_name, attr_value)
+                #save the update object back to storage
+                storage.save()
+            
+            else:
+                print("** no instance found **")
+                
+        except Exception as e:
+            print(f"*** Error: {e} **")
+            
 
     def do_all(self, class_name=None):
         """Show all instance or all instance of a specific class."""
